@@ -65,7 +65,7 @@ class CalendarView @JvmOverloads constructor(
                         day,
                         true,
                         isCurrentWeek,
-                        day == localDate.dayOfMonth)
+                        date == LocalDate.now())
                     )
                 }
             )

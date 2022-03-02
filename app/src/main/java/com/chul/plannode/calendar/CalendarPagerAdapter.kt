@@ -13,7 +13,7 @@ class CalendarPagerAdapter: FragmentStateAdapter {
     constructor(activity: FragmentActivity) : super(activity)
     constructor(fragmentManager: FragmentManager, lifecycle: Lifecycle): super(fragmentManager, lifecycle)
 
-    private val currentDate = LocalDate.now()
+    val currentDate = LocalDate.now()
 
     override fun getItemCount() = Int.MAX_VALUE
 

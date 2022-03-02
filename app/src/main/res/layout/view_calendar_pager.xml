@@ -38,6 +38,8 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:layout_marginTop="5dp"
+        android:textColor="@color/white"
+        android:textStyle="bold"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/calendar_pager"
         app:layout_constraintStart_toEndOf="@id/calendar_guide_vertical_20"
