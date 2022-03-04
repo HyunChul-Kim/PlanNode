@@ -33,7 +33,7 @@ class CalendarPagerView @JvmOverloads constructor(
             }
         })
         binding.calendarPager.adapter = adapter
-        binding.calendarPager.currentItem = CalendarPagerAdapter.START_POSITION
+        binding.calendarPager.setCurrentItem(CalendarPagerAdapter.START_POSITION, false)
     }
 
     private fun checkContext(context: Context) {
