@@ -12,6 +12,7 @@ import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.Checkable
 import androidx.core.content.withStyledAttributes
 import com.chul.plannode.R
+import java.time.LocalDate
 
 class DayView @JvmOverloads constructor(
     context: Context,
@@ -68,7 +69,7 @@ class DayView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        val date = configuration.day.toString()
+        val date = configuration.date.dayOfMonth.toString()
         textPaint.getTextBounds(date, 0, date.length, bounds)
         canvas.drawLine(0f, dividerPaint.strokeWidth / 2, width.toFloat(), dividerPaint.strokeWidth / 2, dividerPaint)
         canvas.drawRoundRect(0f, dividerPaint.strokeWidth, width.toFloat(), dividerPaint.strokeWidth + (height * 0.1f) + bounds.height(), 10f, 10f, textBoundPaint)
@@ -90,6 +91,10 @@ class DayView @JvmOverloads constructor(
         mChecked = configuration.selected
         updateBackgroundPaint()
     }
+
+    fun getConfiguration() = configuration
+
+    fun generateId(): Int = configuration.date.hashCode()
 
     private fun updateBackground() {
         updateBackgroundPaint()
@@ -144,7 +149,7 @@ class DayView @JvmOverloads constructor(
     }
 
     class Configuration private constructor(
-        val day: Int,
+        val date: LocalDate,
         val dayColor: Int,
         val dayTypeface: Typeface,
         val dividerColor: Int,
@@ -155,15 +160,15 @@ class DayView @JvmOverloads constructor(
     ) {
 
         class Builder {
-            private var day: Int = 1
+            private var date: LocalDate? = null
             private var isCurrentMonth: Boolean = false
             private var isCurrentWeek: Boolean = false
             private var isToday: Boolean = false
             private var dayBoundColor: Int = Color.GRAY
             private var selectedColor: Int = Color.parseColor("#7700b52b")
 
-            fun setDay(day: Int) = apply {
-                this.day = day
+            fun setDate(date: LocalDate) = apply {
+                this.date = date
             }
 
             fun setCurrentMonth(isCurrentMonth: Boolean) = apply {
@@ -188,7 +193,7 @@ class DayView @JvmOverloads constructor(
 
             fun build(): Configuration {
                 return Configuration(
-                    day,
+                    date ?: LocalDate.now(),
                     Color.WHITE,
                     if(isToday) Typeface.create(Typeface.DEFAULT, Typeface.BOLD) else Typeface.create(Typeface.DEFAULT, Typeface.NORMAL),
                     if(isCurrentWeek) Color.GREEN else Color.GRAY,

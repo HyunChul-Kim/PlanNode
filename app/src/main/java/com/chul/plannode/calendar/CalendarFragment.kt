@@ -8,7 +8,10 @@ import androidx.fragment.app.Fragment
 import com.chul.plannode.databinding.FragmentCalendarBinding
 import java.time.LocalDate
 
-class CalendarFragment(private val date: LocalDate): Fragment() {
+class CalendarFragment(
+    private val date: LocalDate,
+    private val calendarHelper: CalendarHelper
+): Fragment() {
 
     private lateinit var binding: FragmentCalendarBinding
 

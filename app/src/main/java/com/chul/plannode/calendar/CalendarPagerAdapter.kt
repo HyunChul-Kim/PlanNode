@@ -14,12 +14,13 @@ class CalendarPagerAdapter: FragmentStateAdapter {
     constructor(fragmentManager: FragmentManager, lifecycle: Lifecycle): super(fragmentManager, lifecycle)
 
     val currentDate = LocalDate.now()
+    lateinit var calendarHelper: CalendarHelper
 
     override fun getItemCount() = Int.MAX_VALUE
 
     override fun createFragment(position: Int): Fragment {
         val diff = position - START_POSITION
-        return CalendarFragment(currentDate.plusMonths(diff.toLong()))
+        return CalendarFragment(currentDate.plusMonths(diff.toLong()), calendarHelper)
     }
 
     companion object {

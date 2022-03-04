@@ -113,12 +113,18 @@ class CalendarView @JvmOverloads constructor(
         }
     }
 
-    private fun generateId(view: View) {
+    private fun generateId(view: DayView) {
         var id = view.id
         if(id == View.NO_ID) {
-            id = View.generateViewId()
+            id = view.generateId()
             view.id = id
         }
+    }
+
+    fun getCheckedViewId() = mCheckedId
+
+    fun clearCheck() {
+        check(-1)
     }
 
     fun initCalendar(localDate: LocalDate) {
@@ -140,7 +146,7 @@ class CalendarView @JvmOverloads constructor(
                     DayView(context).apply {
                         setConfiguration(
                             DayView.Configuration.Builder()
-                                .setDay(day)
+                                .setDate(date)
                                 .setCurrentWeek(isCurrentWeek)
                                 .build())
                     }
@@ -154,7 +160,7 @@ class CalendarView @JvmOverloads constructor(
                 DayView(context).apply {
                     setConfiguration(
                         DayView.Configuration.Builder()
-                            .setDay(day)
+                            .setDate(date)
                             .setCurrentMonth(true)
                             .setCurrentWeek(isCurrentWeek)
                             .setToday(date == today)
@@ -172,7 +178,7 @@ class CalendarView @JvmOverloads constructor(
                     DayView(context).apply {
                         setConfiguration(
                             DayView.Configuration.Builder()
-                                .setDay(day)
+                                .setDate(date)
                                 .setCurrentWeek(isCurrentWeek)
                                 .build()
                         )
