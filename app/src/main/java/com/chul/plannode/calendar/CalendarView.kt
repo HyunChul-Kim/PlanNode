@@ -1,7 +1,6 @@
 package com.chul.plannode.calendar
 
 import android.content.Context
-import android.os.Bundle
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
@@ -17,7 +16,7 @@ class CalendarView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0
-): ViewGroup(context, attrs, defStyle) {
+): ViewGroup(context, attrs, defStyle), CalendarListener {
 
     private var weeksPerMonth = WEEKS_PER_MONTH
 
@@ -34,7 +33,7 @@ class CalendarView @JvmOverloads constructor(
         context.withStyledAttributes(attrs, R.styleable.CalendarView) {
             val date = getString(R.styleable.CalendarView_date) ?: ""
             try {
-                initCalendar(LocalDate.parse(date))
+                initCalendar(LocalDate.parse(date), null)
             } catch (e: Exception) {
 
             }
@@ -62,9 +61,9 @@ class CalendarView @JvmOverloads constructor(
         super.onFinishInflate()
         if(mCheckedId != -1) {
             mProtectFromCheckedChange = true
-            setCheckedStateForView(mCheckedId, true)
+            val date = setCheckedStateForView(mCheckedId, true)
             mProtectFromCheckedChange = false
-            setCheckedId(mCheckedId)
+            setCheckedId(mCheckedId, date)
         }
     }
 
@@ -77,7 +76,7 @@ class CalendarView @JvmOverloads constructor(
                     setCheckedStateForView(mCheckedId, false)
                 }
                 mProtectFromCheckedChange = false
-                setCheckedId(child.id)
+                setCheckedId(child.id, child.getConfiguration().date)
             }
         }
         super.addView(child, index, params)
@@ -94,23 +93,26 @@ class CalendarView @JvmOverloads constructor(
             setCheckedStateForView(mCheckedId, false)
         }
 
+        var date: LocalDate? = null
         if(id != -1) {
-            setCheckedStateForView(id, true)
+            date = setCheckedStateForView(id, true)
         }
 
-        setCheckedId(id)
+        setCheckedId(id, date)
     }
 
-    private fun setCheckedId(id: Int) {
+    private fun setCheckedId(id: Int, date: LocalDate?) {
         mCheckedId = id
-        mOnCheckedChangeListener?.onCheckedChange(this, mCheckedId)
+        mOnCheckedChangeListener?.onCheckedChange(this, mCheckedId, date)
     }
 
-    private fun setCheckedStateForView(viewId: Int, checked: Boolean) {
+    private fun setCheckedStateForView(viewId: Int, checked: Boolean): LocalDate? {
         val view = findViewById<View>(viewId)
         if(view != null && view is DayView) {
             view.isChecked = checked
+            return view.getConfiguration().date
         }
+        return null
     }
 
     private fun generateId(view: DayView) {
@@ -127,13 +129,13 @@ class CalendarView @JvmOverloads constructor(
         check(-1)
     }
 
-    fun initCalendar(localDate: LocalDate) {
+    fun initCalendar(localDate: LocalDate, selectedDate: LocalDate?) {
         removeAllViews()
-        val today = LocalDate.now()
         val firstDayOfMonth = localDate.with(TemporalAdjusters.firstDayOfMonth())
         val firstDayOfWeek = CalendarUtils.firstDayOfWeek(firstDayOfMonth)
         val lastDayOfMonth = localDate.with(TemporalAdjusters.lastDayOfMonth())
         val lastDayOfWeek = CalendarUtils.lastDayOfWeek(lastDayOfMonth)
+        val today = LocalDate.now()
         val firstDayOfCurrentWeek = CalendarUtils.firstDayOfWeek(today)
         val lastDayOfCurrentWeek = CalendarUtils.lastDayOfWeek(today)
         weeksPerMonth = ChronoUnit.WEEKS.between(firstDayOfWeek, lastDayOfWeek) + 1
@@ -148,6 +150,7 @@ class CalendarView @JvmOverloads constructor(
                             DayView.Configuration.Builder()
                                 .setDate(date)
                                 .setCurrentWeek(isCurrentWeek)
+                                .setToday(date == today)
                                 .build())
                     }
                 )
@@ -163,6 +166,7 @@ class CalendarView @JvmOverloads constructor(
                             .setDate(date)
                             .setCurrentMonth(true)
                             .setCurrentWeek(isCurrentWeek)
+                            .setSelected(date == selectedDate)
                             .setToday(date == today)
                             .build()
                     )
@@ -180,6 +184,7 @@ class CalendarView @JvmOverloads constructor(
                             DayView.Configuration.Builder()
                                 .setDate(date)
                                 .setCurrentWeek(isCurrentWeek)
+                                .setToday(date == today)
                                 .build()
                         )
                     }
@@ -194,7 +199,7 @@ class CalendarView @JvmOverloads constructor(
     }
 
     interface OnCheckedChangeListener {
-        fun onCheckedChange(view: CalendarView, id: Int)
+        fun onCheckedChange(view: CalendarView, id: Int, date: LocalDate?)
     }
 
     private inner class CheckedStateTracker: DayView.CheckedChangeListener {
@@ -208,7 +213,8 @@ class CalendarView @JvmOverloads constructor(
             mProtectFromCheckedChange = false
 
             val id = view.id
-            setCheckedId(id)
+            val date = view.getConfiguration().date
+            setCheckedId(id, date)
         }
     }
     private inner class PassThroughHierarchyChangeListener: OnHierarchyChangeListener {
@@ -227,5 +233,9 @@ class CalendarView @JvmOverloads constructor(
             onHierarchyChangeListener?.onChildViewRemoved(parent, child)
         }
 
+    }
+
+    override fun onSelectChange(id: Int, date: LocalDate?) {
+        check(id)
     }
 }

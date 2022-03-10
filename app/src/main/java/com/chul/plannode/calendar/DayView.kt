@@ -3,12 +3,10 @@ package com.chul.plannode.calendar
 import android.content.Context
 import android.graphics.*
 import android.graphics.Paint.ANTI_ALIAS_FLAG
-import android.os.Bundle
 import android.text.TextPaint
 import android.util.AttributeSet
 import android.view.SoundEffectConstants
 import android.view.View
-import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.Checkable
 import androidx.core.content.withStyledAttributes
 import com.chul.plannode.R
@@ -28,6 +26,8 @@ class DayView @JvmOverloads constructor(
     private val bounds = Rect()
 
     private val defaultBackgroundColor = Color.TRANSPARENT
+    private val defaultDividerColor = Color.GRAY
+    private val defaultDividerWidth = 1f
 
     private val textBoundPaint = Paint(ANTI_ALIAS_FLAG).apply {
         color = Color.TRANSPARENT
@@ -72,7 +72,17 @@ class DayView @JvmOverloads constructor(
         val date = configuration.date.dayOfMonth.toString()
         textPaint.getTextBounds(date, 0, date.length, bounds)
         canvas.drawLine(0f, dividerPaint.strokeWidth / 2, width.toFloat(), dividerPaint.strokeWidth / 2, dividerPaint)
-        canvas.drawRoundRect(0f, dividerPaint.strokeWidth, width.toFloat(), dividerPaint.strokeWidth + (height * 0.1f) + bounds.height(), 10f, 10f, textBoundPaint)
+        if(configuration.isToday) {
+            canvas.drawRoundRect(
+                0f,
+                dividerPaint.strokeWidth,
+                width.toFloat(),
+                dividerPaint.strokeWidth + (height * 0.1f) + bounds.height(),
+                10f,
+                10f,
+                textBoundPaint
+            )
+        }
         canvas.drawRect(0f, dividerPaint.strokeWidth, width.toFloat(), height.toFloat(), backgroundPaint)
         canvas.drawText(
             date,
@@ -84,10 +94,10 @@ class DayView @JvmOverloads constructor(
 
     fun setConfiguration(configuration: Configuration) {
         this.configuration = configuration
-        textPaint.typeface = configuration.dayTypeface
+        textPaint.typeface = if(configuration.selected) Typeface.create(Typeface.DEFAULT, Typeface.BOLD) else Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
         textBoundPaint.color = configuration.dayBoundColor
-        dividerPaint.color = configuration.dividerColor
-        dividerPaint.strokeWidth = configuration.dividerStokeWidth
+        dividerPaint.color = if(configuration.isCurrentWeek) configuration.dividerColor else defaultDividerColor
+        dividerPaint.strokeWidth = if(configuration.isCurrentWeek) configuration.dividerStokeWidth else defaultDividerWidth
         mChecked = configuration.selected
         updateBackgroundPaint()
     }
@@ -151,21 +161,25 @@ class DayView @JvmOverloads constructor(
     class Configuration private constructor(
         val date: LocalDate,
         val dayColor: Int,
-        val dayTypeface: Typeface,
         val dividerColor: Int,
         val dividerStokeWidth: Float,
         val dayBoundColor: Int,
         val selectedColor: Int,
-        val selected: Boolean
+        val selected: Boolean,
+        val isToday: Boolean,
+        val isCurrentWeek: Boolean
     ) {
 
         class Builder {
             private var date: LocalDate? = null
             private var isCurrentMonth: Boolean = false
             private var isCurrentWeek: Boolean = false
+            private var isSelected: Boolean = false
             private var isToday: Boolean = false
             private var dayBoundColor: Int = Color.GRAY
             private var selectedColor: Int = Color.parseColor("#7700b52b")
+            private var dividerColor: Int = Color.GREEN
+            private var dividerWidth: Float = 5f
 
             fun setDate(date: LocalDate) = apply {
                 this.date = date
@@ -177,6 +191,10 @@ class DayView @JvmOverloads constructor(
 
             fun setCurrentWeek(isCurrentWeek: Boolean) = apply {
                 this.isCurrentWeek = isCurrentWeek
+            }
+
+            fun setSelected(isSelected: Boolean) = apply {
+                this.isSelected = isSelected
             }
 
             fun setToday(isToday: Boolean) = apply {
@@ -195,12 +213,13 @@ class DayView @JvmOverloads constructor(
                 return Configuration(
                     date ?: LocalDate.now(),
                     Color.WHITE,
-                    if(isToday) Typeface.create(Typeface.DEFAULT, Typeface.BOLD) else Typeface.create(Typeface.DEFAULT, Typeface.NORMAL),
-                    if(isCurrentWeek) Color.GREEN else Color.GRAY,
-                    if(isCurrentWeek) 5f else 1f,
-                    if(isToday) dayBoundColor else Color.TRANSPARENT,
+                    dividerColor,
+                    dividerWidth,
+                    dayBoundColor,
                     selectedColor,
-                    isToday
+                    isSelected,
+                    isToday,
+                    isCurrentWeek
                 )
             }
         }

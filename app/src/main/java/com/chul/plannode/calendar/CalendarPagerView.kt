@@ -5,8 +5,6 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewTreeViewModelStoreOwner
 import androidx.viewpager2.widget.ViewPager2
 import com.chul.plannode.R
 import com.chul.plannode.databinding.ViewCalendarPagerBinding
@@ -22,13 +20,13 @@ class CalendarPagerView @JvmOverloads constructor(
         this,
         true)
     private val adapter: CalendarPagerAdapter
-    private val calendarHelper = CalendarHelper()
+    private val calendarHelper = CalendarController()
     private val format = context.getString(R.string.year_month_title)
 
     init {
         checkContext(context)
         adapter = CalendarPagerAdapter(context as FragmentActivity).apply {
-            this.calendarHelper = calendarHelper
+            calendarController = this@CalendarPagerView.calendarHelper
         }
         binding.calendarPager.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
@@ -43,5 +41,9 @@ class CalendarPagerView @JvmOverloads constructor(
 
     private fun checkContext(context: Context) {
         if(context !is FragmentActivity) throw IllegalArgumentException("Context is not FragmentActivity")
+    }
+
+    companion object {
+        const val TAG = "[CalendarPagerView]"
     }
 }
