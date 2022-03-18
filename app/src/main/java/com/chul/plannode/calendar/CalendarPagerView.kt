@@ -25,9 +25,7 @@ class CalendarPagerView @JvmOverloads constructor(
 
     init {
         checkContext(context)
-        adapter = CalendarPagerAdapter(context as FragmentActivity).apply {
-            calendarController = this@CalendarPagerView.calendarHelper
-        }
+        adapter = CalendarPagerAdapter(context as FragmentActivity, calendarHelper)
         binding.calendarPager.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 val diff = position - CalendarPagerAdapter.START_POSITION

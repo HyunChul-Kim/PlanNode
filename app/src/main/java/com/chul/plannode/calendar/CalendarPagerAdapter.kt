@@ -9,12 +9,18 @@ import java.time.LocalDate
 
 class CalendarPagerAdapter: FragmentStateAdapter {
 
-    constructor(fragment: Fragment) : super(fragment)
-    constructor(activity: FragmentActivity) : super(activity)
-    constructor(fragmentManager: FragmentManager, lifecycle: Lifecycle): super(fragmentManager, lifecycle)
+    constructor(fragment: Fragment, controller: CalendarController) : super(fragment) {
+        calendarController = controller
+    }
+    constructor(activity: FragmentActivity, controller: CalendarController) : super(activity) {
+        calendarController = controller
+    }
+    constructor(fragmentManager: FragmentManager, lifecycle: Lifecycle, controller: CalendarController): super(fragmentManager, lifecycle) {
+        calendarController = controller
+    }
 
-    val currentDate = LocalDate.now()
-    lateinit var calendarController: CalendarController
+    val currentDate: LocalDate = LocalDate.now()
+    private val calendarController: CalendarController
 
     override fun getItemCount() = Int.MAX_VALUE
 

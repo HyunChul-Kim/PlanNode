@@ -23,6 +23,7 @@ class DayView @JvmOverloads constructor(
     private var mBroadcasting = false
 
     private var configuration: Configuration = Configuration.Builder().build()
+    private var colorConfiguration = ColorConfiguration.Builder().build()
     private val bounds = Rect()
 
     private val defaultBackgroundColor = Color.TRANSPARENT
@@ -30,7 +31,7 @@ class DayView @JvmOverloads constructor(
     private val defaultDividerWidth = 1f
 
     private val textBoundPaint = Paint(ANTI_ALIAS_FLAG).apply {
-        color = Color.TRANSPARENT
+        color = Color.GRAY
         style = Paint.Style.FILL
     }
     private val backgroundPaint = Paint(ANTI_ALIAS_FLAG).apply {
@@ -95,8 +96,7 @@ class DayView @JvmOverloads constructor(
     fun setConfiguration(configuration: Configuration) {
         this.configuration = configuration
         textPaint.typeface = if(configuration.selected) Typeface.create(Typeface.DEFAULT, Typeface.BOLD) else Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
-        textBoundPaint.color = configuration.dayBoundColor
-        dividerPaint.color = if(configuration.isCurrentWeek) configuration.dividerColor else defaultDividerColor
+        dividerPaint.color = if(configuration.isCurrentWeek) colorConfiguration.dividerColor else defaultDividerColor
         dividerPaint.strokeWidth = if(configuration.isCurrentWeek) configuration.dividerStokeWidth else defaultDividerWidth
         mChecked = configuration.selected
         updateBackgroundPaint()
@@ -113,7 +113,7 @@ class DayView @JvmOverloads constructor(
 
     private fun updateBackgroundPaint() {
         if(mChecked) {
-            backgroundPaint.color = configuration.selectedColor
+            backgroundPaint.color = colorConfiguration.selectedColor
             textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
         } else {
             backgroundPaint.color = defaultBackgroundColor
@@ -160,11 +160,7 @@ class DayView @JvmOverloads constructor(
 
     class Configuration private constructor(
         val date: LocalDate,
-        val dayColor: Int,
-        val dividerColor: Int,
         val dividerStokeWidth: Float,
-        val dayBoundColor: Int,
-        val selectedColor: Int,
         val selected: Boolean,
         val isToday: Boolean,
         val isCurrentWeek: Boolean
@@ -176,9 +172,6 @@ class DayView @JvmOverloads constructor(
             private var isCurrentWeek: Boolean = false
             private var isSelected: Boolean = false
             private var isToday: Boolean = false
-            private var dayBoundColor: Int = Color.GRAY
-            private var selectedColor: Int = Color.parseColor("#7700b52b")
-            private var dividerColor: Int = Color.GREEN
             private var dividerWidth: Float = 5f
 
             fun setDate(date: LocalDate) = apply {
@@ -200,28 +193,30 @@ class DayView @JvmOverloads constructor(
             fun setToday(isToday: Boolean) = apply {
                 this.isToday = isToday
             }
-
-            fun setDayBoundColor(color: Int) = apply {
-                this.dayBoundColor = color
-            }
-
-            fun setSelectedColor(color: Int) = apply {
-                this.selectedColor = color
-            }
-
             fun build(): Configuration {
                 return Configuration(
                     date ?: LocalDate.now(),
-                    Color.WHITE,
-                    dividerColor,
                     dividerWidth,
-                    dayBoundColor,
-                    selectedColor,
                     isSelected,
                     isToday,
                     isCurrentWeek
                 )
             }
+        }
+    }
+
+    class ColorConfiguration private constructor(
+        val dividerColor: Int,
+        val selectedColor: Int
+    ) {
+        class Builder {
+            private var dividerColor = Color.GREEN
+            private var selectedColor: Int = Color.parseColor("#7700b52b")
+            fun build() =
+                ColorConfiguration(
+                    dividerColor,
+                    selectedColor
+                )
         }
     }
 }
