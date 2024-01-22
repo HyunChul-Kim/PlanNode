@@ -1,7 +1,6 @@
 package com.chul.plannode.calendar
 
 import android.content.Context
-import android.os.Bundle
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
@@ -19,7 +18,7 @@ class CalendarView @JvmOverloads constructor(
     defStyle: Int = 0
 ): ViewGroup(context, attrs, defStyle) {
 
-    private var weeksPerMonth = WEEKS_PER_MONTH
+    private var weeksPerMonth = WEEKS_IN_MONTH
 
     private var mCheckedId = -1
     private var mProtectFromCheckedChange = false
@@ -47,12 +46,12 @@ class CalendarView @JvmOverloads constructor(
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        val dayWidth = width.toFloat() / DAYS_PER_WEEK
+        val dayWidth = width.toFloat() / DAYS_IN_WEEK
         val dayHeight = height.toFloat() / weeksPerMonth
         var index = 0
         children.forEach { view ->
-            val left = (index % DAYS_PER_WEEK) * dayWidth
-            val top = (index / DAYS_PER_WEEK) * dayHeight
+            val left = (index % DAYS_IN_WEEK) * dayWidth
+            val top = (index / DAYS_IN_WEEK) * dayHeight
             view.layout(left.toInt(), top.toInt(), (left + dayWidth).toInt(), (top + dayHeight).toInt())
             index++
         }
@@ -183,8 +182,8 @@ class CalendarView @JvmOverloads constructor(
     }
 
     companion object {
-        const val DAYS_PER_WEEK = 7
-        const val WEEKS_PER_MONTH: Long = 5
+        private const val DAYS_IN_WEEK = 7
+        private const val WEEKS_IN_MONTH: Long = 5
     }
 
     interface OnCheckedChangeListener {

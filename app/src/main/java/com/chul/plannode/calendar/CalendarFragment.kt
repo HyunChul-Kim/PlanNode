@@ -23,7 +23,7 @@ class CalendarFragment(private val date: LocalDate): Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.fragmentCalendarView.initCalendar(date)
+        //binding.fragmentCalendarView.initCalendar(date)
     }
 
 }

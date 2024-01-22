@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="month_height">20dp</dimen>
+    <dimen name="day_of_week_height">10dp</dimen>
+    <dimen name="day_width">50dp</dimen>
+    <dimen name="day_selector_radius">3dp</dimen>
+    <dimen name="minimum_width">50dp</dimen>
+</resources>
